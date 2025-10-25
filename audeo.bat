@@ -2,9 +2,6 @@
 chcp 65001 >nul
 setlocal enabledelayedexpansion
 
-REM Verifier si yt-dlp est à jour
-yt-dlp\yt-dlp.exe -U
-
 echo.
 echo    █████████                  █████                  
 echo   ███░░░░░███                ░░███                   
@@ -20,6 +17,8 @@ echo ║         Utilise yt-dlp en ligne de commande        ║
 echo ║----------------------------------------------------║
 echo ║      version 1.0 - 14 - 10 - 2025 - by Eclouf      ║
 echo ╚════════════════════════════════════════════════════╝
+echo.
+
 echo.
 REM Vérifie si yt-dlp.exe est présent, sinon le télécharge
 if not exist ".\yt-dlp\yt-dlp.exe" (
@@ -55,8 +54,13 @@ if not exist ".\yt-dlp\ffmpeg.exe" (
 
 set "FFMPEG_PATH=.\yt-dlp\ffmpeg.exe"
 
+REM Verifier si yt-dlp est à jour
+yt-dlp\yt-dlp.exe -U
+
 :MENU
+echo.
 REM Demande à l'utilisateur l'URL de la vidéo
+echo =========== URL de la vidéo ===========
 set /p "VIDEO_URL=Entrez l'URL de la vidéo à télécharger : "
 if "!VIDEO_URL!"=="" goto MENU
 
@@ -69,22 +73,26 @@ if not exist "!DEST_FOLDER!\Audeo" (
 ) else set DEST_FOLDER=%DEST_FOLDER%\Audeo
 
 REM Affiche le menu
-echo ______________________________________________________________________________________________________
-echo MENU :
-echo .
-echo Choisissez une ou plusieurs options de téléchargement yt-dlp en séparant par + (exemple : 1+3+5) :
-echo 1. Télécharger la meilleure qualité vidéo+audio
-echo 2. Télécharger uniquement l'audio (m4a)
-echo 3. Télécharger la meilleure vidéo seule
-echo 4. Télécharger la meilleure audio seule
-echo 5. Télécharger avec les sous-titres
-echo 6. Ajouter la miniature de la vidéo
-echo 7. Ajouter les metadonnées
-echo 8. Télécharger un album complet (playlist)
-echo 9. Télécharger un film
-echo 10. Changer le dossier de destination (par défaut %USERPROFILE%\Downloads\Audeo)
-echo 0. Quitter
-echo ________________________________________________________________________________________________________
+echo.
+echo ╔═══════════════════════════════════════════════════════════════════════════════════════╗
+echo ║MENU:                                                       choix des options: ex: 1+5 ║
+echo ╠═══════════════════════════════════════════════════════════════════════════════════════╣
+echo ║1. Télécharger la meilleure qualité vidéo+audio                                        ║
+echo ║2. Télécharger uniquement l'audio (m4a)                                                ║
+echo ║3. Télécharger la meilleure vidéo seule                                                ║
+echo ║4. Télécharger la meilleure audio seule                                                ║
+echo ║5. Télécharger avec les sous-titres                                                    ║
+echo ║6. Ajouter la miniature de la vidéo                                                    ║
+echo ║7. Ajouter les metadonnées                                                             ║
+echo ║8. Télécharger un album complet (playlist)                                             ║
+echo ║9. Télécharger un film                                                                 ║
+echo ║10. Changer le dossier de destination (par défaut ~\Downloads\Audeo)                   ║
+echo ║                                                                                       ║
+echo ║0. Mode debug (affiche les logs détaillés)                                             ║
+echo ║q. Quitter                                                                             ║   
+echo ╚═══════════════════════════════════════════════════════════════════════════════════════╝
+echo.
+echo Sélectionnez vos options (ex: 1+5) :
 set /p "CHOIX=Entrez vos choix : "
 set CHOIX=!CHOIX: =!
 
@@ -142,7 +150,15 @@ for %%a in (!CHOIX_TMP!) do (
             set DEST_FOLDER=%DEST_FOLDER%\Audeo
         ) else set DEST_FOLDER=%DEST_FOLDER%\Audeo
     )
+	if "%%a"=="0000" (
+        set "OPTIONS= -j -v"
+        set VALID_CHOICE=1
+    )
     if "%%a"=="0" (
+        set "OPTIONS=!OPTIONS! -v"
+        set VALID_CHOICE=1
+    )
+    if "%%a"=="q" (
         echo Quitter...
         exit /b 0
     )
@@ -158,8 +174,13 @@ REM Affiche résumé des options choisies
 echo Options sélectionnées : !OPTIONS!
 
 REM Exécute yt-dlp avec les paramètres fournis
+echo.
+echo =================== DÉBUT DU TÉLÉCHARGEMENT ===================
 echo Téléchargement en cours...
 .\yt-dlp\yt-dlp.exe !OPTIONS! -o "!DEST_FOLDER!\%%(title)s.%%(ext)s" !VIDEO_URL!
+echo.
+echo =================== TÉLÉCHARGEMENT TERMINÉ ====================
+echo Vidéos téléchargées dans le dossier : !DEST_FOLDER!
 
 pause
 goto MENU
