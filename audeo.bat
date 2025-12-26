@@ -15,7 +15,8 @@ echo ╔════════════════════════
 echo ║                Téléchargeur de vidéos              ║
 echo ║         Utilise yt-dlp en ligne de commande        ║
 echo ║----------------------------------------------------║
-echo ║      version 1.0 - 14 - 10 - 2025 - by Eclouf      ║
+echo ║      version 1.0 - 26 - 12 - 2025 - by Eclouf      ║
+echo ║       https://github.com/Eclouf/Audeo-script       ║
 echo ╚════════════════════════════════════════════════════╝
 echo.
 
@@ -80,13 +81,14 @@ echo ╠════════════════════════
 echo ║1. Télécharger la meilleure qualité vidéo+audio                                        ║
 echo ║2. Télécharger uniquement l'audio (m4a)                                                ║
 echo ║3. Télécharger la meilleure vidéo seule                                                ║
-echo ║4. Télécharger la meilleure audio seule                                                ║
+echo ║4. Télécharger le meilleur audio seule                                                 ║
 echo ║5. Télécharger avec les sous-titres                                                    ║
 echo ║6. Ajouter la miniature de la vidéo                                                    ║
 echo ║7. Ajouter les metadonnées                                                             ║
 echo ║8. Télécharger un album complet (playlist)                                             ║
 echo ║9. Télécharger un film                                                                 ║
 echo ║10. Changer le dossier de destination (par défaut ~\Downloads\Audeo)                   ║
+echo ║11. Télécharger un élément d'une playlist                                              ║
 echo ║                                                                                       ║
 echo ║0. Mode debug (affiche les logs détaillés)                                             ║
 echo ║q. Quitter                                                                             ║   
@@ -108,7 +110,7 @@ for %%a in (!CHOIX_TMP!) do (
         set VALID_CHOICE=1
     )
     if "%%a"=="2" (
-        set "OPTIONS=!OPTIONS! -f bestaudio --audio-format m4a"
+        set "OPTIONS=!OPTIONS! -f -f bestaudio[ext=m4a] --audio-format m4a"
         set VALID_CHOICE=1
     )
     if "%%a"=="3" (
@@ -149,6 +151,10 @@ for %%a in (!CHOIX_TMP!) do (
             mkdir "!DEST_FOLDER!\Audeo"
             set DEST_FOLDER=%DEST_FOLDER%\Audeo
         ) else set DEST_FOLDER=%DEST_FOLDER%\Audeo
+    )
+	if "%%a"=="11" (
+        set "OPTIONS=!OPTIONS! --no-playlist"
+        set VALID_CHOICE=1
     )
 	if "%%a"=="0000" (
         set "OPTIONS= -j -v"
