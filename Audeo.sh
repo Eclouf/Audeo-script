@@ -4,45 +4,103 @@
 export LANG=C.UTF-8
 export LC_ALL=C.UTF-8
 
+# Couleurs pour le texte
+# Définir les couleurs
+RED='\033[0;31m'
+GREEN='\033[0;32m'
+YELLOW='\033[1;33m'
+BLUE='\033[0;34m'
+CYAN='\033[0;36m'
+NC='\033[0m' # No Color
+
+# Afficher la bannière
+echo
+echo "   █████████                  █████                  "
+echo "  ███░░░░░███                ░░███                   "
+echo " ░███    ░███  █████ ████  ███████   ██████   ██████ "
+echo " ░███████████ ░░███ ░███  ███░░███  ███░░███ ███░░███"
+echo " ░███░░░░░███  ░███ ░███ ░███ ░███ ░███████ ░███ ░███"
+echo " ░███    ░███  ░███ ░███ ░███ ░███ ░███░░░  ░███ ░███"
+echo " █████   █████ ░░████████░░████████░░██████ ░░██████ "
+echo "░░░░░   ░░░░░   ░░░░░░░░  ░░░░░░░░  ░░░░░░   ░░░░░░  "
+echo "╔════════════════════════════════════════════════════╗"
+echo "║              Téléchargeur de vidéos                ║"
+echo "║           Utilise yt-dlp en ligne de commande      ║"
+echo "║----------------------------------------------------║"
+echo "║      version 1.1 - 08 - 01 - 2026 - by Eclouf      ║"
+echo -e "║       ${BLUE}https://github.com/Eclouf/Audeo-script${NC}       ║"
+echo "╚════════════════════════════════════════════════════╝"
+echo
 YT_DLP_DIR="./yt-dlp"
 YT_DLP_EXEC="$YT_DLP_DIR/yt-dlp"
 FFMPEG_EXEC="$YT_DLP_DIR/ffmpeg"
 DOWNLOADS_DIR="$HOME/Downloads"
 AUDIO_DIR="$DOWNLOADS_DIR/Audeo"
 
+
+
 # Vérifier et créer dossier yt-dlp
 mkdir -p "$YT_DLP_DIR"
 mkdir -p "$AUDIO_DIR"
+
+# Vérifier si curl est présent
+if ! command -v curl &> /dev/null; then
+    echo -e "${RED}curl introuvable, installation en cours...${NC}"
+    if [[ "$OSTYPE" == "linux-gnu"* ]]; then
+        if command -v apt-get &> /dev/null; then
+            sudo apt-get update && sudo apt-get install -y curl
+        elif command -v dnf &> /dev/null; then
+            sudo dnf install -y curl
+        else
+            echo -e "${RED}Impossible d'installer curl. Veuillez l'installer manuellement.${NC}"
+            exit 1
+        fi
+    else
+        echo -e "${RED}curl n'a pas pu être trouvé. Veuillez l'installer manuellement.${NC}"
+        exit 1
+    fi
+fi
 
 # Fonction pour télécharger un fichier avec curl
 download_file() {
     local url=$1
     local output=$2
-    echo "Téléchargement de $output ..."
+    echo -e "${CYAN}Téléchargement de $output ...${NC}"
     if curl -L --fail --show-error "$url" -o "$output"; then
-        echo "$output téléchargé avec succès."
+        echo -e "${GREEN}$output téléchargé avec succès.${NC}"
     else
-        echo "Échec du téléchargement de $output. Vérifiez votre connexion internet."
+        echo -e "${RED}Échec du téléchargement de $output. Vérifiez votre connexion internet.${NC}"
         exit 1
+    fi
+}
+
+# Fonction pour valider une URL
+validate_url() {
+    local url=$1
+    if [[ $url =~ ^https?:// ]]; then
+        return 0
+    else
+        return 1
     fi
 }
 
 # Vérifier si yt-dlp est présent, sinon le télécharger
 if ! [ -x "$YT_DLP_EXEC" ]; then
-    echo "yt-dlp introuvable, téléchargement en cours..."
+    echo -e "${YELLOW}yt-dlp introuvable, téléchargement en cours...${NC}"
     # verifier le système d'exploitation
     if [[ "$OSTYPE" == "linux-gnu"* ]]; then
         download_file "https://github.com/yt-dlp/yt-dlp/releases/latest/download/yt-dlp_linux" "$YT_DLP_EXEC"
     elif [[ "$OSTYPE" == "darwin"* ]]; then
         download_file "https://github.com/yt-dlp/yt-dlp/releases/latest/download/yt-dlp_macos" "$YT_DLP_EXEC"
     else
-        echo "Système d'exploitation non pris en charge : $OSTYPE"
+        echo -e "${RED}Système d'exploitation non pris en charge : $OSTYPE${NC}"
         exit 1
     fi
     chmod +x "$YT_DLP_EXEC"
 fi
 
 # Mettre à jour yt-dlp
+echo -e "${CYAN}Mise à jour de yt-dlp...${NC}"
 "$YT_DLP_EXEC" -U
 
     # Vérifier et installer les dépendances nécessaires
@@ -108,29 +166,19 @@ fi
             unzip -o "$YT_DLP_DIR/ffmpeg.zip" -d "$YT_DLP_DIR"
             rm "$YT_DLP_DIR/ffmpeg.zip"
             chmod +x "$FFMPEG_EXEC"
-        
+        fi
     fi
 
 while true; do
-    echo
-    echo "   █████████                  █████                  "
-    echo "  ███░░░░░███                ░░███                   "
-    echo " ░███    ░███  █████ ████  ███████   ██████   ██████ "
-    echo " ░███████████ ░░███ ░███  ███░░███  ███░░███ ███░░███"
-    echo " ░███░░░░░███  ░███ ░███ ░███ ░███ ░███████ ░███ ░███"
-    echo " ░███    ░███  ░███ ░███ ░███ ░███ ░███░░░  ░███ ░███"
-    echo " █████   █████ ░░████████░░████████░░██████ ░░██████ "
-    echo "░░░░░   ░░░░░   ░░░░░░░░  ░░░░░░░░  ░░░░░░   ░░░░░░  "
-    echo "╔════════════════════════════════════════════════════╗"
-    echo "║              Téléchargeur de vidéos                ║"
-    echo "║           Utilise yt-dlp en ligne de commande      ║"
-    echo "║----------------------------------------------------║"
-    echo "║      version 1.0 - 14 - 10 - 2025 - by Eclouf      ║"
-    echo "╚════════════════════════════════════════════════════╝"
-    echo
 
     read -rp "Entrez l'URL de la vidéo à télécharger : " VIDEO_URL
     if [ -z "$VIDEO_URL" ]; then
+        continue
+    fi
+
+    # Valider l'URL
+    if ! validate_url "$VIDEO_URL"; then
+        echo -e "${RED}URL invalide. Veuillez entrer une URL commençant par http:// ou https://${NC}"
         continue
     fi
 
@@ -138,22 +186,24 @@ while true; do
     DEST_FOLDER="$AUDIO_DIR"
     mkdir -p "$DEST_FOLDER"
 
-    echo "______________________________________________________________________________________________________"
-    echo "MENU :"
-    echo
-    echo "Choisissez une ou plusieurs options de téléchargement yt-dlp en séparant par + (exemple : 1+3+5) :"
-    echo "1. Télécharger la meilleure qualité vidéo+audio"
-    echo "2. Télécharger uniquement l'audio (m4a)"
-    echo "3. Télécharger la meilleure vidéo seule"
-    echo "4. Télécharger la meilleure audio seule"
-    echo "5. Télécharger avec les sous-titres"
-    echo "6. Ajouter la miniature de la vidéo"
-    echo "7. Ajouter les metadonnées"
-    echo "8. Télécharger un album complet (playlist)"
-    echo "9. Télécharger un film"
-    echo "10. Changer le dossier de destination (par défaut $DEST_FOLDER)"
-    echo "0. Quitter"
-    echo "________________________________________________________________________________________________________"
+    echo -e "╔═══════════════════════════════════════════════════════════════════════════════════╗"
+    echo -e "║ ${YELLOW}MENU:${NC}                                                  choix des options: ${GREEN}ex: 1+5${NC} ║"
+    echo -e "╠═══════════════════════════════════════════════════════════════════════════════════╣"
+    echo -e "║ ${CYAN}1.${NC} Télécharger la meilleure qualité vidéo+audio                                   ║"
+    echo -e "║ ${CYAN}2.${NC} Télécharger uniquement l'audio (m4a)                                           ║"
+    echo -e "║ ${CYAN}3.${NC} Télécharger la meilleure vidéo seule                                           ║"
+    echo -e "║ ${CYAN}4.${NC} Télécharger le meilleur audio seule                                            ║"
+    echo -e "║ ${CYAN}5.${NC} Télécharger avec les sous-titres                                               ║"
+    echo -e "║ ${CYAN}6.${NC} Ajouter la miniature de la vidéo                                               ║"
+    echo -e "║ ${CYAN}7.${NC} Ajouter les metadonnées                                                        ║"
+    echo -e "║ ${CYAN}8.${NC} Télécharger un album complet (playlist)                                        ║"
+    echo -e "║ ${CYAN}9.${NC} Télécharger un film                                                            ║"
+    echo -e "║ ${CYAN}10.${NC} Changer le dossier de destination (par défaut ~\Downloads\Audeo)              ║"
+    echo -e "║ ${CYAN}11.${NC} Télécharger un élément d'une playlist                                         ║"
+    echo -e "║                                                                                   ║"
+    echo -e "║ ${CYAN}0.${NC} Mode debug (affiche les logs détaillés)                                        ║"
+    echo -e "║ ${RED}q.${NC} Quitter                                                                        ║"   
+    echo -e "╚═══════════════════════════════════════════════════════════════════════════════════╝"
     read -rp "Entrez vos choix : " CHOIX
 
     OPTIONS=""
@@ -210,26 +260,30 @@ while true; do
                 fi
                 mkdir -p "$DEST_FOLDER"
                 ;;
-            0)
+            q|Q)
                 echo "Quitter..."
                 exit 0
                 ;;
             *)
-                echo "Choix invalide : $c"
+                echo -e "${RED}Choix invalide : $c${NC}"
                 ;;
         esac
     done
 
     if [ "$VALID_CHOICE" -eq 0 ]; then
-        echo "Aucun choix valide n'a été saisi. Veuillez réessayer."
+        echo -e "${RED}ERROR${NC} Aucun choix valide n'a été saisi. Veuillez réessayer."
         continue
     fi
 
-    echo "Options sélectionnées : $OPTIONS"
-    echo "Téléchargement en cours..."
+    echo -e "${BLUE}INFO${NC} Options sélectionnées : ${CYAN}$OPTIONS${NC}"
+    echo -e "${BLUE}INFO${NC} Téléchargement en cours..."
 
     "$YT_DLP_EXEC" $OPTIONS -o "$DEST_FOLDER/%(title)s.%(ext)s" "$VIDEO_URL"
 
-    echo "Appuyez sur [Entrée] pour continuer..."
-    read -r
+    echo -e "Appuyez sur ${GREEN}[Entrée] ${BLUE}pour continuer${NC} ou ${GREEN}[q|Q] ${BLUE}pour quitter${NC}."
+    read -r CHOICE
+    if [[ "$CHOICE" == "q" || "$CHOICE" == "Q" ]]; then
+        echo -e "${GREEN}Fin du script !${NC}"
+        exit 0
+    fi
 done
